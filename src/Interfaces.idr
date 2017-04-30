@@ -35,7 +35,7 @@ interface Coherent (R : m -> m -> Type) where
   cohe : Cohe R x y
 
 interface WeakCoherent (R : m -> m -> Type) where
-  wcohe : DecEq m => {x, y : m} -> (x = y -> Void) -> Cohe R x y
+  wcohe : {x, y : m} -> (x = y -> Void) -> Cohe R x y
 
 interface Connexive (R : m -> m -> Type) where
   conx : Either (x = y) (Cohe R x y)
