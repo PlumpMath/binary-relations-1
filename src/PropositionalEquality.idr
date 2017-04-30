@@ -2,7 +2,6 @@ module PropositionalEquality
 
 import Interfaces
 
-
 Reflexive (=) where
   refl = Refl
 

@@ -15,7 +15,7 @@ Uninhabited (NatLe (S _) Z) where
 
 Reflexive NatLe where
   refl {x = Z} = ZA
-  refl {x = S x} = SS (refl {x})
+  refl {x = S _} = SS refl
 
 Antisymmetric NatLe where
   antisymm ZA ZA = Refl
@@ -24,6 +24,38 @@ Antisymmetric NatLe where
 Transitive NatLe where
   trans ZA _ = ZA
   trans (SS pf1) (SS pf2) = SS (trans pf1 pf2)
+
+--{- Cohe NatLe instances
+
+Reflexive (Cohe NatLe) where
+  refl {x = Z} = Dir ZA
+  refl {x = S _} = Dir refl
+
+cohe'' : (x, y : Nat) -> Cohe (Cohe NatLe) x y
+cohe'' Z _ = Dir (Dir ZA)
+cohe'' _ Z = Inv (Dir ZA)
+cohe'' (S k) (S j) = case cohe'' k j of
+  Dir (Dir prf) => Dir (Dir (SS prf))
+  Dir (Inv prf) => Dir (Inv (SS prf))
+  Inv (Dir prf) => Inv (Dir (SS prf))
+  Inv (Inv prf) => Inv (Inv (SS prf))
+
+Coherent (Cohe NatLe) where
+  cohe {x} {y} = cohe'' x y
+
+wcohe'' : (x, y : Nat) -> (x = y -> Void) -> Cohe (Cohe NatLe) x y
+wcohe'' Z Z contra = void (contra Refl)
+wcohe'' k j _ = cohe
+
+WeakCoherent (Cohe NatLe) where
+  wcohe {x} {y} = wcohe'' x y
+
+conx'' : (x, y : Nat) -> Either (x = y) (Cohe (Cohe NatLe) x y)
+conx'' x y with (decEq x y)
+  conx'' x y | (Yes prf) = Left prf
+  conx'' x y | (No contra) = Right (wcohe contra)
+
+---}
 
 -- FIXME
 private
