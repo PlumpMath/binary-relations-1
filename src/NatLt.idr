@@ -27,8 +27,8 @@ Transitive NatLt where
 private
 wcohe' : (x, y : Nat) -> (x = y -> Void) -> Cohe NatLt x y
 wcohe' Z Z contra = void (contra Refl)
-wcohe' Z (S _) _ = ?wcohe'_rhs_4
-wcohe' (S _) Z _ = ?wcohe'_rhs_1
+wcohe' Z (S _) _ = Dir ZS
+wcohe' (S _) Z _ = Inv ZS
 wcohe' (S k) (S j) contra = case wcohe' k j (contra . cong) of
   Dir prf => Dir (SS prf)
   Inv prf => Inv (SS prf)
