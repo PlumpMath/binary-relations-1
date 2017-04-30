@@ -1,0 +1,8 @@
+package binary_relations
+
+sourcedir = src
+
+modules
+  = Interfaces
+  , NatLt
+  , NatLe
