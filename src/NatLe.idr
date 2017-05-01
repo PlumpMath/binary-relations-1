@@ -25,43 +25,29 @@ Transitive NatLe where
   trans ZA _ = ZA
   trans (SS pf1) (SS pf2) = SS (trans pf1 pf2)
 
--- FIXME
-private
-cohe' : (x, y : Nat) -> Cohe NatLe x y
-cohe' Z _ = Dir ZA
-cohe' _ Z = Inv ZA
-cohe' (S k) (S j) = case cohe' k j of
-  Dir prf => Dir (SS prf)
-  Inv prf => Inv (SS prf)
-
 Coherent NatLe where
-  cohe {x} {y} = cohe' x y
-
--- FIXME
-private
-wcohe' : (x, y : Nat) -> (x = y -> Void) -> Cohe NatLe x y
-wcohe' Z Z contra = void (contra Refl)
-wcohe' Z (S _) _ = Dir ZA
-wcohe' (S _) Z _ = Inv ZA
-wcohe' (S k) (S j) contra = case wcohe' k j (contra . cong) of
-  Dir prf => Dir (SS prf)
-  Inv prf => Inv (SS prf)
+  cohe {x = Z} = Dir ZA
+  cohe {y = Z} = Inv ZA
+  cohe {x = S k} {y = S j} = case the (Cohe NatLe k j) cohe of
+    Dir prf => Dir (SS prf)
+    Inv prf => Inv (SS prf)
 
 WeakCoherent NatLe where
-  wcohe {x} {y} = wcohe' x y
-
--- FIXME
-private
-conx' : (x, y : Nat) -> Either (x = y) (Cohe NatLe x y)
-conx' Z Z = Left Refl
-conx' Z (S _) = Right (Dir ZA)
-conx' (S _) Z = Right (Inv ZA)
-conx' (S k) (S j) = case conx' k j of
-  Left Refl => Left Refl
-  Right (Dir prf) => Right (Dir (SS prf))
-  Right (Inv prf) => Right (Inv (SS prf))
+  wcohe {x = Z} {y = Z} contra = void (contra Refl)
+  wcohe {x = Z} _ = Dir ZA
+  wcohe {y = Z} _ = Inv ZA
+  wcohe {x = S k} {y = S j} contra = let contra = contra . cong in
+    case the (Cohe NatLe k j) (wcohe contra) of
+      Dir prf => Dir (SS prf)
+      Inv prf => Inv (SS prf)
 
 Connexive NatLe where
-  conx {x} {y} = conx' x y
+  conx {x = Z} {y = Z} = Left Refl
+  conx {x = Z} = Right (Dir ZA)
+  conx {y = Z} = Right (Inv ZA)
+  conx {x = S k} {y = S j} = case the (Either (k = j) (Cohe NatLe k j)) conx of
+    Left Refl => Left Refl
+    Right (Dir prf) => Right (Dir (SS prf))
+    Right (Inv prf) => Right (Inv (SS prf))
 
 PartialOrder NatLe where
